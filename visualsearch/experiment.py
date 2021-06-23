@@ -2,13 +2,14 @@ import argparse
 import os
 import csv
 from math import sin, cos, pi
-from random import random
+import random
 from typing import Dict, List, Optional
 from psychopy import visual, core, event
 from psychopy.hardware import keyboard
 
 VALID_STIMULI_DIR = "true"
 INVALID_STIMULI_DIR = "false"
+package_folder = os.path.dirname(os.path.abspath(__file__))
 
 
 class VisualSearch:
@@ -19,6 +20,8 @@ class VisualSearch:
                                          lineWidth=2,
                                          closeShape=False,
                                          lineColor="black")
+        self.tick = visual.ImageStim(win=self.window, image=os.path.join(package_folder, "misc", "tick.png"), size=2)
+        self.fail = visual.ImageStim(win=self.window, image=os.path.join(package_folder, "misc", "fail.png"), size=2)
         self.stimuli = self.load_stimuli(stimuli_location)
         self.kb = keyboard.Keyboard()
         self.rad = circle_rad
@@ -27,7 +30,7 @@ class VisualSearch:
         return random.sample(self.stimuli["valid"], 1)
 
     def get_invalid(self, n: int) -> List[visual.ImageStim]:
-        return random.sample(self.stimuli["valid"], n)
+        return random.sample(self.stimuli["invalid"], n)
 
     def place_stimuli(self, nc: int, is_target_present: bool) -> List[visual.ImageStim]:
         """ Place randomly the stimuli around a circle with radius `r`. """
@@ -36,7 +39,7 @@ class VisualSearch:
         random.shuffle(stimuli)
 
         angle_div = 2 * pi / len(stimuli)
-        rand_offset = random() * 2 * pi
+        rand_offset = random.random() * 2 * pi
 
         for i, s in enumerate(stimuli):
             angle = angle_div * i + rand_offset
@@ -57,9 +60,9 @@ class VisualSearch:
 
     def show_feedback(self, success: bool) -> None:
         if success:
-            self.success_visual.draw()
+            self.tick.draw()
         else:
-            self.failure_visual.draw()
+            self.fail.draw()
         self.window.update()
 
     def run_trial(self,
@@ -73,7 +76,7 @@ class VisualSearch:
             3. Show feedback for a `feedback_timeout`.
         """
         # TODO: 0. Get items for experiment
-        stimuli = self.place_stimuli(nc=4, is_target_present=True)
+        stimuli = self.place_stimuli(nc=2, is_target_present=True)
 
         # 1. Show blank with fixation.
         self.show_fixation()
@@ -90,6 +93,9 @@ class VisualSearch:
         # 3. Show feedback.
         self.show_feedback(True)
         core.wait(feedback_timeout)
+
+        # 4. Clear the screen.
+        self.window.update()
 
     def load_stimuli(self, location: str) -> Dict[str, List[visual.ImageStim]]:
         # Check if location exists.
