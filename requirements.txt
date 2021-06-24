@@ -1,2 +1,1 @@
 psychopy
-psychtoolbox == 3.0.16
