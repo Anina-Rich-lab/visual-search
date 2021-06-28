@@ -19,8 +19,14 @@ By default, a set of stimuli are included in the `stimuli` folder, and can be ta
 Feel free to change the images in this folder for your experiment.
 
 - Change condition blocks:
-In the provided example, 3 blocks of trials with different number of conditions, distance to the center of the screen and number of repetitions are provided.
+In the provided example, 3 blocks of trials with different settings.
 You can change the existing blocks or add more to your experiment by editing the `experiment_setup` variable in the `visualsearch.py` script.
+The avaliable settings are:
+    - `conditions`: Number of elements appearing on each trial.
+    - `radio`: All elements appear in a circle of radio `radio` around the fixation.
+    - `repetitions`: Number of trials per block.
+    - `feedback_time`: How long the feedback should be shown (in seconds).
+    - `prerun_time`: How long will it pass between the start of the trial and when the stimuli are shown (in seconds).
 
 
 

@@ -16,6 +16,8 @@ from psychopy.hardware import keyboard
         `conditions`: Number of elements appearing on each trial
         `radio`: All elements appear in a circle of radio `radio` around the fixation
         `repetitions`: Number of trials per block
+        `feedback_time`: How long the feedback should be shown (s)
+        `prerun_time`: How long will it pass between the start of the trial and when the stimuli are shown (s)
 """
 experiment_setup = [
     # Block 1
