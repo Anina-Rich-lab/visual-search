@@ -59,14 +59,19 @@ data_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.csv')
 
 
 class VisualSearch:
+    """
+        Visual search experiment.
+    """
     def __init__(self,
                  config: Dict,
                  data_file: str,
                  target_present_key: Optional[str] = 'x',
                  target_not_present_key: Optional[str] = 'm') -> None:
 
+        # Configuration
         self.config = config
         self.data_file = data_file
+        self.config['RunNumber'] = self.subject_run_number()
 
         # Window setup
         self.window = visual.Window(fullscr=True, monitor="testMonitor", units="deg")
@@ -96,21 +101,24 @@ class VisualSearch:
         self.ntp_key = target_not_present_key
 
     def get_image_stim(self, sid: str, n: int, repeat: Optional[bool] = True) -> List[visual.ImageStim]:
+        """ Generate a list of stimuli. """
         if repeat:
             return [visual.ImageStim(win=self.window, image=random.choice(self.stimuli[sid]), size=2) for _ in range(n)]
         else:
             return [visual.ImageStim(win=self.window, image=f, size=2) for f in random.sample(self.stimuli[sid], n)]
 
-    def get_valid(self) -> List[visual.ImageStim]:
-        return self.get_image_stim("valid", 1, repeat=False)
+    def get_target(self) -> List[visual.ImageStim]:
+        """ Generate a list with one target stimuli. """
+        return self.get_image_stim("target", 1, repeat=False)
 
-    def get_invalid(self, n: int) -> List[visual.ImageStim]:
-        return self.get_image_stim("invalid", n)
+    def get_distractor(self, n: int) -> List[visual.ImageStim]:
+        """ Generate a list with n distractor stimuli. """
+        return self.get_image_stim("distractor", n)
 
     def place_stimuli(self, nc: int, is_target_present: bool, r: float) -> List[visual.ImageStim]:
         """ Place randomly the stimuli around a circle with radius `r`. """
 
-        stimuli = self.get_valid() + self.get_invalid(nc - 1) if is_target_present else self.get_invalid(nc)
+        stimuli = self.get_target() + self.get_distractor(nc - 1) if is_target_present else self.get_distractor(nc)
         random.shuffle(stimuli)
 
         angle_div = 2 * pi / len(stimuli)
@@ -123,6 +131,7 @@ class VisualSearch:
         return stimuli
 
     def show_items(self, stimuli: List[visual.ImageStim], show_fix: Optional[bool] = True) -> None:
+        """ Update screen to show the fixation and stimuli. """
         for s in stimuli:
             s.draw()
         if show_fix:
@@ -130,10 +139,12 @@ class VisualSearch:
         self.window.update()
 
     def show_fixation(self) -> None:
+        """ Update screen to show the fixation only. """
         self.fixation.draw()
         self.window.update()
 
     def show_feedback(self, success: bool) -> None:
+        """ Update screen to show wether the answer was correct. """
         if success:
             self.tick.draw()
         else:
@@ -157,6 +168,7 @@ class VisualSearch:
         stimuli = self.place_stimuli(nc=n_conditions, is_target_present=is_target_present, r=radio)
         result = {
                 'sId': self.config['Subject'],
+                'run_number': self.config['RunNumber'],
                 'target_present': is_target_present,
                 'conditions': n_conditions,
                 'radio': radio,
@@ -188,14 +200,15 @@ class VisualSearch:
         self.window.update()
         return result
 
-    def load_stimuli(self, location: str) -> Dict[str, List[visual.ImageStim]]:
+    def load_stimuli(self, location: str) -> Dict[str, List[str]]:
+        """ Check the stimuli folder and get the files for target and distractors. """
         # Check if location exists.
         if not os.path.isdir(location):
             raise ValueError("Invalid address: {}".format(location))
         # Check if there is something in the folder.
-        valid_folder = os.path.join(location, target_stimuli_dir_name)
-        invalid_folder = os.path.join(location, distractor_stimuli_dir_name)
-        if not os.path.isdir(valid_folder) and os.path.isdir(invalid_folder):
+        target_folder = os.path.join(location, target_stimuli_dir_name)
+        distractor_folder = os.path.join(location, distractor_stimuli_dir_name)
+        if not os.path.isdir(target_folder) and os.path.isdir(distractor_folder):
             raise ValueError(
                 "Folder {} does not contain stimuli folders {} or {}.".format(
                     location,
@@ -203,16 +216,17 @@ class VisualSearch:
                     distractor_stimuli_dir_name))
 
         # Now, we can get all images in the folders.
-        stimuli = {"valid": [], "invalid": []}
-        for im in os.listdir(valid_folder):
-            stimuli["valid"].append(os.path.join(valid_folder, im))
+        stimuli = {"target": [], "distractor": []}
+        for im in os.listdir(target_folder):
+            stimuli["target"].append(os.path.join(target_folder, im))
 
-        for im in os.listdir(invalid_folder):
-            stimuli["invalid"].append(os.path.join(invalid_folder, im))
+        for im in os.listdir(distractor_folder):
+            stimuli["distractor"].append(os.path.join(distractor_folder, im))
 
         return stimuli
 
     def store_data(self, info: dict) -> None:
+        """ Write entry of CSV file. """
         if not os.path.isfile(self.data_file):
             # Create new file and add header.
             with open(self.data_file, 'w') as f:
@@ -224,13 +238,30 @@ class VisualSearch:
                 writer = csv.DictWriter(f, tuple(info.keys()))
                 writer.writerow(info)
 
+    def subject_run_number(self) -> int:
+        """ Get the last experiment number for a given subject. """
+        if not os.path.isfile(self.data_file):
+            return 0
+        with open(self.data_file, 'r') as f:
+            entries = []
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row['sId'] == self.config['Subject']:
+                    entries.append(int(row['run_number']))
+            return max(entries) + 1
+
     @staticmethod
-    def gen_trials(n_trials):
-        trials = [True if i < n_trials // 2 else False for i in range(n_trials)]
+    def gen_trials(n: int) -> List[bool]:
+        """
+            For a number of trials `n`, create an index of trials where 50% are guaranteed to be positive and 50%
+            negative.
+        """
+        trials = [True if i < n // 2 else False for i in range(n)]
         random.shuffle(trials)
         return trials
 
-    def run(self):
+    def run(self) -> None:
+        """ Run the experiment. """
         for block in self.config['blocks']:
             trials = self.gen_trials(block['repetitions'])
             for t in trials:
