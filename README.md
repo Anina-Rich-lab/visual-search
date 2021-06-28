@@ -22,3 +22,21 @@ Feel free to change the images in this folder for your experiment.
 In the provided example, 3 blocks of trials with different number of conditions, distance to the center of the screen and number of repetitions are provided.
 You can change the existing blocks or add more to your experiment by editing the `experiment_setup` variable in the `visualsearch.py` script.
 
+
+
+## CSV file fields.
+Description of the fields in the csv file where the data is stored.
+
+| Key | Value |
+| --- | --- |
+| sId | Id of the subject for the experiment. |
+| run_number | For each subject, the id of the run. This allows differentiating when the same the subject runs the experiment multiple times. |
+| target_present | True if the target was visible in the trial, otherwise False. |
+| conditions | Number of conditions in the trial. |
+| radio | Distance from the center of the screen to each stimuli. |
+| fixation_time | Period of time where only the fixation was shown (before stimuli appear) in seconds.|
+| feedback_time | Period of time where the feedback was visible (after participant responds) in seconds. |
+| timestamp | Timestamp marking the beggining of a trial (Unix timestamp).|
+| response_time | Time between the moment when the stimuli are shown and the participant response is detected. |
+| correct_answer | Wether the participant answered correctly (True) or not (False). |
+| pressed_key | What key was pressed by the participant. |
