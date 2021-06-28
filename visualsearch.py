@@ -22,19 +22,25 @@ experiment_setup = [
     {
         'conditions': 8,
         'radio': 10,
-        'repetitions': 10
+        'repetitions': 10,
+        'feedback_time': 2,
+        'prerun_time': 3,
     },
     # Block 2
     {
         'conditions': 12,
         'radio': 12,
-        'repetitions': 10
+        'repetitions': 10,
+        'feedback_time': 2,
+        'prerun_time': 3,
     },
     # Block 3
     {
         'conditions': 16,
         'radio': 14,
-        'repetitions': 10
+        'repetitions': 10,
+        'feedback_time': 2,
+        'prerun_time': 3,
     }
     # ... Feel free to add more blocks.
 ]
@@ -248,7 +254,10 @@ class VisualSearch:
             for row in reader:
                 if row['sId'] == self.config['Subject']:
                     entries.append(int(row['run_number']))
-            return max(entries) + 1
+            if len(entries) == 0:
+                return 0
+            else:
+                return max(entries) + 1
 
     @staticmethod
     def gen_trials(n: int) -> List[bool]:
@@ -265,7 +274,11 @@ class VisualSearch:
         for block in self.config['blocks']:
             trials = self.gen_trials(block['repetitions'])
             for t in trials:
-                r = self.run_trial(is_target_present=t, n_conditions=block['conditions'], radio=block['radio'])
+                r = self.run_trial(is_target_present=t,
+                                   n_conditions=block['conditions'],
+                                   radio=block['radio'],
+                                   feedback_timeout=block.get('feedback_time', 3.0),
+                                   fixation_timeout=block.get('prerun_time', 2.0))
                 self.store_data(r)
 
 
