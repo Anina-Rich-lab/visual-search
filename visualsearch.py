@@ -48,6 +48,29 @@ experiment_setup = [
 ]
 
 """
+    Text shown in the introduction.
+"""
+introduction_text = """
+    Example introduction.
+
+    ---------------------
+    In this experiment, you will be finding red circles in the screen.
+    The experiment consists of several trials with increased difficulty.
+    Each trial starts with an empty screen where only the center of the screen is marked by a cross.
+    After some time, a set of objects will appear. You need to detect if a red circle is present on the screen.
+    Press the `x` if you can see the target in the screen, and `m` if it is not there.
+
+    When you are ready, press any key to start.
+    ---------------------
+
+    """
+
+"""
+    Text shown when finished.
+"""
+final_text = """ Thank you for participating! """
+
+"""
     By default, we expect the stimuli images to be placed in a folder called `stimuli` next to this script, and
     containing two subfolders `target` and `distractor` containing the target and distractor stimuli respectively (like
     in the provided example).
@@ -152,12 +175,28 @@ class VisualSearch:
         self.window.update()
 
     def show_feedback(self, success: bool) -> None:
-        """ Update screen to show wether the answer was correct. """
+        """ Update screen to show whether the answer was correct. """
         if success:
             self.tick.draw()
         else:
             self.fail.draw()
         self.window.update()
+
+    def show_text_page(self, text: str, blocking: Optional[bool] = True) -> None:
+        """ Show page with some text. """
+        introduction = visual.TextStim(self.window, text=text, wrapWidth=100)
+        introduction.draw()
+        self.window.update()
+        if blocking:
+            self.kb.waitKeys()
+
+    def show_introduction(self) -> None:
+        """ Show page with introduction text. """
+        self.show_text_page(self.config['intro'])
+
+    def show_outro(self) -> None:
+        """ Show page with introduction text. """
+        self.show_text_page(self.config['outro'])
 
     def run_trial(self,
                   is_target_present: bool,
@@ -273,6 +312,7 @@ class VisualSearch:
 
     def run(self) -> None:
         """ Run the experiment. """
+        self.show_introduction()
         for block in self.config['blocks']:
             trials = self.gen_trials(block['repetitions'])
             for t in trials:
@@ -282,6 +322,7 @@ class VisualSearch:
                                    feedback_timeout=block.get('feedback_time', 3.0),
                                    fixation_timeout=block.get('prerun_time', 2.0))
                 self.store_data(r)
+        self.show_outro()
 
 
 if __name__ == '__main__':
@@ -290,10 +331,15 @@ if __name__ == '__main__':
         'Subject': '',
     }
 
-    gui.DlgFromDict(config)
+    info_dlg = gui.DlgFromDict(config)
 
-    # Append experiment setup configuration.
-    config['blocks'] = experiment_setup
+    if info_dlg.OK:
+        # Append experiment setup configuration.
+        config['blocks'] = experiment_setup
 
-    vs = VisualSearch(config=config, data_file=data_file)
-    vs.run()
+        # Append text to configuration
+        config['intro'] = introduction_text
+        config['outro'] = final_text
+
+        vs = VisualSearch(config=config, data_file=data_file)
+        vs.run()

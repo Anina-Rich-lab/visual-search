@@ -4,7 +4,7 @@ Experiment template for visual search, based on psychopy.
 
 In this specific case, a set of stimuli appear in a circle around the center of the screen.
 On each trial, there is a 50% chance of the `target` stimuli to appear.
-The task for the subjects is to respond as fast as possible wether the target is present in the current trial.
+The task for the subjects is to respond as fast as possible whether the target is present in the current trial.
 
 To recreate this experiment, you can download this repository, open it on psychopy and run the `visualsearch.py` script.
 When you run the script, you will be prompted with a dialog to enter the id of the participant.
@@ -28,7 +28,7 @@ The avaliable settings are:
     - `feedback_time`: How long the feedback should be shown (in seconds).
     - `prerun_time`: How long will it pass between the start of the trial and when the stimuli are shown (in seconds).
 
-
+- Change the introduction and goodbye texts via the `introduction_text` and `final_text` variables.
 
 ## CSV file fields.
 Description of the fields in the csv file where the data is stored.
@@ -44,5 +44,5 @@ Description of the fields in the csv file where the data is stored.
 | feedback_time | Period of time where the feedback was visible (after participant responds) in seconds. |
 | timestamp | Timestamp marking the beggining of a trial (Unix timestamp).|
 | response_time | Time between the moment when the stimuli are shown and the participant response is detected. |
-| correct_answer | Wether the participant answered correctly (True) or not (False). |
+| correct_answer | whether the participant answered correctly (True) or not (False). |
 | pressed_key | What key was pressed by the participant. |
