@@ -11,6 +11,8 @@ When you run the script, you will be prompted with a dialog to enter the id of t
 
 After each trial, the result will be written to a file `data.csv` next to the script.
 
+You can press the `esc` key to exit the experiment.
+
 ## Changes to the experiment.
 There is a few options that you can play with in this script:
 
@@ -22,11 +24,12 @@ Feel free to change the images in this folder for your experiment.
 In the provided example, 3 blocks of trials with different settings.
 You can change the existing blocks or add more to your experiment by editing the `experiment_setup` variable in the `visualsearch.py` script.
 The avaliable settings are:
-    - `conditions`: Number of elements appearing on each trial.
+    - `set_size`: Number of elements appearing on each trial.
     - `radio`: All elements appear in a circle of radio `radio` around the fixation.
     - `repetitions`: Number of trials per block.
-    - `feedback_time`: How long the feedback should be shown (in seconds).
-    - `prerun_time`: How long will it pass between the start of the trial and when the stimuli are shown (in seconds).
+    - `feedback_timeout`: How long the feedback should be shown (in seconds).
+    - `prerun_timeout`: How long will it pass between the start of the trial and when the stimuli are shown (in seconds).
+    - `stimuli_timeout`: Maximum allowed response time (if the participant does not respond on time, the trial answer will be marked as incorrect).
 
 - Change the introduction and goodbye texts via the `introduction_text` and `final_text` variables.
 
@@ -38,11 +41,12 @@ Description of the fields in the csv file where the data is stored.
 | sId | Id of the subject for the experiment. |
 | run_number | For each subject, the id of the run. This allows differentiating when the same the subject runs the experiment multiple times. |
 | target_present | True if the target was visible in the trial, otherwise False. |
-| conditions | Number of conditions in the trial. |
+| set_size | Number of conditions in the trial. |
 | radio | Distance from the center of the screen to each stimuli. |
-| fixation_time | Period of time where only the fixation was shown (before stimuli appear) in seconds.|
-| feedback_time | Period of time where the feedback was visible (after participant responds) in seconds. |
+| feedback_timeout | Period of time where only the fixation was shown (before stimuli appear) in seconds.|
+| prerun_timeout | Period of time where the feedback was visible (after participant responds) in seconds. |
 | timestamp | Timestamp marking the beggining of a trial (Unix timestamp).|
 | response_time | Time between the moment when the stimuli are shown and the participant response is detected. |
 | correct_answer | whether the participant answered correctly (True) or not (False). |
 | pressed_key | What key was pressed by the participant. |
+| response_timed_out | True if the participand did not respond on time. |

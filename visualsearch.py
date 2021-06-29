@@ -13,36 +13,41 @@ from psychopy.hardware import keyboard
     configure the experiment.
 
     On each block:
-        `conditions`: Number of elements appearing on each trial
+        `set_size`: Number of elements appearing on each trial
         `radio`: All elements appear in a circle of radio `radio` around the fixation
         `repetitions`: Number of trials per block
-        `feedback_time`: How long the feedback should be shown (s)
-        `prerun_time`: How long will it pass between the start of the trial and when the stimuli are shown (s)
+        `feedback_timeout`: How long the feedback should be shown (s)
+        `fixation_timeout`: How long will it pass between the start of the trial and when the stimuli are shown (s)
+        `response_timeout`: Maximum allowed response time (if the participant does not respond on time, the trial answer
+                           will be marked as incorrect).
 """
 experiment_setup = [
     # Block 1
     {
-        'conditions': 8,
+        'set_size': 4,
         'radio': 10,
         'repetitions': 10,
-        'feedback_time': 2,
-        'prerun_time': 3,
+        'feedback_timeout': 1,
+        'fixation_timeout': 0.5,
+        'response_timeout': 4,
     },
     # Block 2
     {
-        'conditions': 12,
+        'set_size': 8,
         'radio': 12,
         'repetitions': 10,
-        'feedback_time': 2,
-        'prerun_time': 3,
+        'feedback_timeout': 2,
+        'fixation_timeout': 3,
+        'response_timeout': 4,
     },
     # Block 3
     {
-        'conditions': 16,
+        'set_size': 12,
         'radio': 14,
         'repetitions': 10,
-        'feedback_time': 2,
-        'prerun_time': 3,
+        'feedback_timeout': 2,
+        'fixation_timeout': 3,
+        'response_timeout': 4,
     }
     # ... Feel free to add more blocks.
 ]
@@ -106,7 +111,7 @@ class VisualSearch:
 
         # Window setup
         self.window = visual.Window(fullscr=True, monitor="testMonitor", units="deg")
-        event.globalKeys.add(key='q', modifiers=['ctrl'], func=core.quit)
+        event.globalKeys.add(key='escape', func=core.quit)
         self.fixation = visual.ShapeStim(self.window,
                                          vertices=((0, -0.5), (0, 0.5), (0, 0), (-0.5, 0), (0.5, 0)),
                                          lineWidth=2,
@@ -200,7 +205,7 @@ class VisualSearch:
 
     def run_trial(self,
                   is_target_present: bool,
-                  n_conditions: int,
+                  set_size: int,
                   radio: float,
                   feedback_timeout: Optional[float] = 3.0,
                   fixation_timeout: Optional[float] = 2.0,
@@ -212,15 +217,15 @@ class VisualSearch:
             3. Show feedback for a `feedback_timeout`.
         """
         # 0. Get items for experiment
-        stimuli = self.place_stimuli(nc=n_conditions, is_target_present=is_target_present, r=radio)
+        stimuli = self.place_stimuli(nc=set_size, is_target_present=is_target_present, r=radio)
         result = {
                 'sId': self.config['Subject'],
                 'run_number': self.config['RunNumber'],
                 'target_present': is_target_present,
-                'conditions': n_conditions,
+                'set_size': set_size,
                 'radio': radio,
-                'fixation_time': fixation_timeout,
-                'feedback_time': feedback_timeout,
+                'fixation_timeout': fixation_timeout,
+                'feedback_timeout': feedback_timeout,
                 'timestamp': core.getAbsTime()
             }
 
@@ -233,11 +238,19 @@ class VisualSearch:
         self.kb.clock.reset()
         keys = self.kb.waitKeys(maxWait=response_timeout, keyList=[self.tp_key, self.ntp_key])
 
-        for key in keys:
-            correct = key.name == (self.tp_key if is_target_present else self.ntp_key)
-            result['response_time'] = key.rt
-            result['correct_answer'] = correct
-            result['pressed_key'] = key.name
+        correct = False
+        if keys:
+            for key in keys:
+                correct = key.name == (self.tp_key if is_target_present else self.ntp_key)
+                result['correct_answer'] = correct
+                result['pressed_key'] = key.name
+                result['response_time'] = key.rt
+                result['response_timed_out'] = False
+        else:
+            result['correct_answer'] = False
+            result['pressed_key'] = ''
+            result['response_time'] = 0
+            result['response_timed_out'] = True
 
         # 3. Show feedback.
         self.show_feedback(correct)
@@ -317,10 +330,11 @@ class VisualSearch:
             trials = self.gen_trials(block['repetitions'])
             for t in trials:
                 r = self.run_trial(is_target_present=t,
-                                   n_conditions=block['conditions'],
+                                   set_size=block['set_size'],
                                    radio=block['radio'],
-                                   feedback_timeout=block.get('feedback_time', 3.0),
-                                   fixation_timeout=block.get('prerun_time', 2.0))
+                                   feedback_timeout=block.get('feedback_timeout', 3.0),
+                                   fixation_timeout=block.get('fixation_timeout', 2.0),
+                                   response_timeout=block.get('response_timeout', float('inf')))
                 self.store_data(r)
         self.show_outro()
 
