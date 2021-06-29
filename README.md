@@ -33,6 +33,8 @@ The avaliable settings are:
 
 - Change the introduction and goodbye texts via the `introduction_text` and `final_text` variables.
 
+- Change the size of the stimuli with the `size_of_stimuli` variable.
+
 ## CSV file fields.
 Description of the fields in the csv file where the data is stored.
 

@@ -34,19 +34,19 @@ experiment_setup = [
     # Block 2
     {
         'set_size': 8,
-        'radio': 12,
+        'radio': 10,
         'repetitions': 10,
-        'feedback_timeout': 2,
-        'fixation_timeout': 3,
+        'feedback_timeout': 1,
+        'fixation_timeout': 0.5,
         'response_timeout': 4,
     },
     # Block 3
     {
         'set_size': 12,
-        'radio': 14,
+        'radio': 10,
         'repetitions': 10,
-        'feedback_timeout': 2,
-        'fixation_timeout': 3,
+        'feedback_timeout': 1,
+        'fixation_timeout': 0.5,
         'response_timeout': 4,
     }
     # ... Feel free to add more blocks.
@@ -74,6 +74,11 @@ introduction_text = """
     Text shown when finished.
 """
 final_text = """ Thank you for participating! """
+
+"""
+    Size of stimuli.
+"""
+size_of_stimuli = 2
 
 """
     By default, we expect the stimuli images to be placed in a folder called `stimuli` next to this script, and
@@ -110,7 +115,7 @@ class VisualSearch:
         self.config['RunNumber'] = self.subject_run_number()
 
         # Window setup
-        self.window = visual.Window(fullscr=True, monitor="testMonitor", units="deg")
+        self.window = visual.Window(fullscr=True, monitor="testMonitor", units="cm")
         event.globalKeys.add(key='escape', func=core.quit)
         self.fixation = visual.ShapeStim(self.window,
                                          vertices=((0, -0.5), (0, 0.5), (0, 0), (-0.5, 0), (0.5, 0)),
@@ -139,9 +144,13 @@ class VisualSearch:
     def get_image_stim(self, sid: str, n: int, repeat: Optional[bool] = True) -> List[visual.ImageStim]:
         """ Generate a list of stimuli. """
         if repeat:
-            return [visual.ImageStim(win=self.window, image=random.choice(self.stimuli[sid]), size=2) for _ in range(n)]
+            return [visual.ImageStim(win=self.window,
+                                     image=random.choice(self.stimuli[sid]),
+                                     size=size_of_stimuli) for _ in range(n)]
         else:
-            return [visual.ImageStim(win=self.window, image=f, size=2) for f in random.sample(self.stimuli[sid], n)]
+            return [visual.ImageStim(win=self.window,
+                                     image=f,
+                                     size=size_of_stimuli) for f in random.sample(self.stimuli[sid], n)]
 
     def get_target(self) -> List[visual.ImageStim]:
         """ Generate a list with one target stimuli. """
