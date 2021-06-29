@@ -25,11 +25,11 @@ In the provided example, 3 blocks of trials with different settings.
 You can change the existing blocks or add more to your experiment by editing the `experiment_setup` variable in the `visualsearch.py` script.
 The avaliable settings are:
     - `set_size`: Number of elements appearing on each trial.
-    - `radio`: All elements appear in a circle of radio `radio` around the fixation.
+    - `radio`: All elements appear in a circle of radio `radio` around the fixation (you should keep it between 5 and 15).
     - `repetitions`: Number of trials per block.
     - `feedback_timeout`: How long the feedback should be shown (in seconds).
     - `prerun_timeout`: How long will it pass between the start of the trial and when the stimuli are shown (in seconds).
-    - `stimuli_timeout`: Maximum allowed response time (if the participant does not respond on time, the trial answer will be marked as incorrect).
+    - `response_timeout`: Maximum allowed response time (if the participant does not respond on time, the trial answer will be marked as incorrect).
 
 - Change the introduction and goodbye texts via the `introduction_text` and `final_text` variables.
 
