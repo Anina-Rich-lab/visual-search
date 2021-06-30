@@ -30,6 +30,7 @@ The avaliable settings are:
     - `feedback_timeout`: How long the feedback should be shown (in seconds).
     - `prerun_timeout`: How long will it pass between the start of the trial and when the stimuli are shown (in seconds).
     - `response_timeout`: Maximum allowed response time (if the participant does not respond on time, the trial answer will be marked as incorrect).
+    - `rotate_images`: If True, the stimuli will be rotated randomly on each trial.
 
 - Change the introduction and goodbye texts via the `introduction_text` and `final_text` variables.
 
@@ -52,3 +53,4 @@ Description of the fields in the csv file where the data is stored.
 | correct_answer | whether the participant answered correctly (True) or not (False). |
 | pressed_key | What key was pressed by the participant. |
 | response_timed_out | True if the participand did not respond on time. |
+| stimuli_rotated | True if the stimuli were rotated randomly for this trial. |

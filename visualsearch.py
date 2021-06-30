@@ -20,6 +20,7 @@ from psychopy.hardware import keyboard
         `fixation_timeout`: How long will it pass between the start of the trial and when the stimuli are shown (s)
         `response_timeout`: Maximum allowed response time (if the participant does not respond on time, the trial answer
                            will be marked as incorrect).
+        `rotate_images`: If True, the stimuli will be rotated randomly on each trial.
 """
 experiment_setup = [
     # Block 1
@@ -30,6 +31,7 @@ experiment_setup = [
         'feedback_timeout': 1,
         'fixation_timeout': 0.5,
         'response_timeout': 4,
+        'rotate_images': True,
     },
     # Block 2
     {
@@ -39,6 +41,7 @@ experiment_setup = [
         'feedback_timeout': 1,
         'fixation_timeout': 0.5,
         'response_timeout': 4,
+        'rotate_images': True,
     },
     # Block 3
     {
@@ -48,6 +51,7 @@ experiment_setup = [
         'feedback_timeout': 1,
         'fixation_timeout': 0.5,
         'response_timeout': 4,
+        'rotate_images': True,
     }
     # ... Feel free to add more blocks.
 ]
@@ -160,7 +164,7 @@ class VisualSearch:
         """ Generate a list with n distractor stimuli. """
         return self.get_image_stim("distractor", n)
 
-    def place_stimuli(self, nc: int, is_target_present: bool, r: float) -> List[visual.ImageStim]:
+    def place_stimuli(self, nc: int, is_target_present: bool, r: float, rotated: bool) -> List[visual.ImageStim]:
         """ Place randomly the stimuli around a circle with radius `r`. """
 
         stimuli = self.get_target() + self.get_distractor(nc - 1) if is_target_present else self.get_distractor(nc)
@@ -172,6 +176,8 @@ class VisualSearch:
         for i, s in enumerate(stimuli):
             angle = angle_div * i + rand_offset
             s.pos = [r * cos(angle), r * sin(angle)]
+            if rotated:
+                s.ori = random.random() * 360
 
         return stimuli
 
@@ -216,6 +222,7 @@ class VisualSearch:
                   is_target_present: bool,
                   set_size: int,
                   radio: float,
+                  images_rotate: bool,
                   feedback_timeout: Optional[float] = 3.0,
                   fixation_timeout: Optional[float] = 2.0,
                   response_timeout: Optional[float] = float('inf')) -> Dict:
@@ -226,13 +233,14 @@ class VisualSearch:
             3. Show feedback for a `feedback_timeout`.
         """
         # 0. Get items for experiment
-        stimuli = self.place_stimuli(nc=set_size, is_target_present=is_target_present, r=radio)
+        stimuli = self.place_stimuli(nc=set_size, is_target_present=is_target_present, r=radio, rotated=images_rotate)
         result = {
                 'sId': self.config['Subject'],
                 'run_number': self.config['RunNumber'],
                 'target_present': is_target_present,
                 'set_size': set_size,
                 'radio': radio,
+                'stimuli_rotated': images_rotate,
                 'fixation_timeout': fixation_timeout,
                 'feedback_timeout': feedback_timeout,
                 'timestamp': core.getAbsTime()
@@ -348,6 +356,7 @@ class VisualSearch:
                 r = self.run_trial(is_target_present=t,
                                    set_size=block['set_size'],
                                    radio=block['radio'],
+                                   images_rotate=block.get('rotate_images', False),
                                    feedback_timeout=block.get('feedback_timeout', 3.0),
                                    fixation_timeout=block.get('fixation_timeout', 2.0),
                                    response_timeout=block.get('response_timeout', float('inf')))
