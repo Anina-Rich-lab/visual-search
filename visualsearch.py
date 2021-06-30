@@ -270,7 +270,12 @@ class VisualSearch:
         return result
 
     def load_stimuli(self, location: str) -> Dict[str, List[str]]:
-        """ Check the stimuli folder and get the files for target and distractors. """
+        """
+            Check the stimuli folder and get the files for target and distractors.
+
+            Accepted file extensions: 'png', 'jpg'
+        """
+
         # Check if location exists.
         if not os.path.isdir(location):
             raise ValueError("Invalid address: {}".format(location))
@@ -287,10 +292,12 @@ class VisualSearch:
         # Now, we can get all images in the folders.
         stimuli = {"target": [], "distractor": []}
         for im in os.listdir(target_folder):
-            stimuli["target"].append(os.path.join(target_folder, im))
+            if im.endswith("png") or im.endswith("jpg"):
+                stimuli["target"].append(os.path.join(target_folder, im))
 
         for im in os.listdir(distractor_folder):
-            stimuli["distractor"].append(os.path.join(distractor_folder, im))
+            if im.endswith("png") or im.endswith("jpg"):
+                stimuli["distractor"].append(os.path.join(distractor_folder, im))
 
         return stimuli
 
