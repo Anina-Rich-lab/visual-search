@@ -18,7 +18,7 @@ There is a few options that you can play with in this script:
 
 - Change the stimuli images:
 By default, a set of stimuli are included in the `stimuli` folder, and can be targets (in the `target` folder) or distractors (in `distractor`).
-Feel free to change the images in this folder for your experiment.
+Feel free to change the images in this folder for your experiment, but note that only `jpg` and `png` files can be used.
 
 - Change condition blocks:
 In the provided example, 3 blocks of trials with different settings.
@@ -42,6 +42,9 @@ Description of the fields in the csv file where the data is stored.
 | Key | Value |
 | --- | --- |
 | sId | Id of the subject for the experiment. |
+| age | Subject age. |
+| handedness | Subject handedness. |
+| sex | Subject sex. |
 | run_number | For each subject, the id of the run. This allows differentiating when the same the subject runs the experiment multiple times. |
 | target_present | True if the target was visible in the trial, otherwise False. |
 | set_size | Number of conditions in the trial. |

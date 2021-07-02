@@ -236,6 +236,9 @@ class VisualSearch:
         stimuli = self.place_stimuli(nc=set_size, is_target_present=is_target_present, r=radio, rotated=images_rotate)
         result = {
                 'sId': self.config['Subject'],
+                'age': self.config['Age'],
+                'handedness': self.config['Handedness'],
+                'sex': self.config['Sex'],
                 'run_number': self.config['RunNumber'],
                 'target_present': is_target_present,
                 'set_size': set_size,
@@ -368,6 +371,9 @@ if __name__ == '__main__':
 
     config = {
         'Subject': '',
+        'Age': '',
+        'Handedness': ['L', 'R', 'Ambidextrous', 'Prefer not to say'],
+        'Sex': ['Female', 'Male', 'Nonbinary', 'Other', 'Prefer not to say'],
     }
 
     info_dlg = gui.DlgFromDict(config)
